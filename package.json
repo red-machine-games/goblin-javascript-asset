@@ -1,0 +1,42 @@
+{
+  "name": "gbase-html5-sdk",
+  "version": "0.0.4",
+  "description": "JavaScript client library for Goblin Backend server",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "author": "Andrew Medvedev <andrew.medvedev.nh@gmail.com>",
+  "license": "GNU AGPLv3",
+  "bugs": {
+    "url": "https://github.com/red-machine-games/goblin-javascript-asset/issues"
+  },
+  "homepage": "https://gbase.tech/",
+  "dependencies": {
+    "crc-32": "^1.2.0",
+    "crypto-js": "^3.1.9-1",
+    "eventemitter3": "^3.1.2",
+    "isomorphic-ws": "^4.0.1",
+    "object-path": "^0.11.4",
+    "superagent": "^5.0.5",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "browserify": "^16.2.3",
+    "chai": "^4.2.0",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-util": "^3.0.8",
+    "mocha": "^6.1.4",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:red-machine-games/goblin-javascript-asset.git"
+  }
+}
