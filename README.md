@@ -8,4 +8,12 @@ This is javascript asset to work with Goblin Backend: https://gbase.tech/
 
 To transpile it for browser use: run `gulp bundle`
 
+## Install
+
+Via npm: `$ npm i --save gbase-html5-sdk`
+From CDN:
+```html
+<script src="https://gbase-public-static.ams3.cdn.digitaloceanspaces.com/gbase-html5-latest-min.js"></script>
+```
+
 Documentation here: http://gbase.tech/doc/htmlAssetApi/gbaseApi/
