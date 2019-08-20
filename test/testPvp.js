@@ -579,7 +579,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_DIRECT){
                         if(++theMessagesCounter === HOW_MUCH_DIRECT){
                             pvp_01.removeAllListeners('progress');
@@ -641,7 +641,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_DIRECT){
                         if(++theMessagesCounter === HOW_MUCH_DIRECT){
                             pvp_01.removeAllListeners('progress');
@@ -703,7 +703,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_TURNS - 1){
                         if(++theMessagesCounter === HOW_MUCH_TURNS - 1){
                             pvp_01.removeAllListeners('progress');
@@ -765,7 +765,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_TURNS - 1){
                         if(++theMessagesCounter === HOW_MUCH_TURNS - 1){
                             pvp_01.removeAllListeners('progress');
@@ -828,17 +828,20 @@ describe('testPvp.js', () => {
 
                 let callbackFn_Finish = (i, msg) => {
                     expect(msg.ok).to.be.equal(true);
+                    expect(msg.details.endMessage).to.have.property('gameIsOver', true);
+                    expect(msg.details.endMessage).to.have.property('finalm');
+                    expect(msg.details.endMessage.finalm).to.have.property('m');
                     try{
-                        expect(msg.details.endMessage).to.have.property('asq', HOW_MUCH_TURNS);
+                        expect(msg.details.endMessage.finalm).to.have.property('asq', HOW_MUCH_TURNS);
                     } catch(__){
-                        expect(msg.details.endMessage).to.have.property('bsq', HOW_MUCH_TURNS);
+                        expect(msg.details.endMessage.finalm).to.have.property('bsq', HOW_MUCH_TURNS);
                     }
                     try{
-                        expect(msg.details.endMessage).to.have.property('bsq', HOW_MUCH_TURNS - 1);
+                        expect(msg.details.endMessage.finalm).to.have.property('bsq', HOW_MUCH_TURNS - 1);
                     } catch(__){
-                        expect(msg.details.endMessage).to.have.property('asq', HOW_MUCH_TURNS - 1);
+                        expect(msg.details.endMessage.finalm).to.have.property('asq', HOW_MUCH_TURNS - 1);
                     }
-                    expect(msg.details.endMessage.m).to.deep.equal({ m: 'FIN!' });
+                    expect(msg.details.endMessage.finalm.m).to.deep.equal({ message: 'FIN!' });
 
                     if(i === 0){
                         if(!firstIsDone){
@@ -1155,7 +1158,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_TURNS - 1){
                         if(++theMessagesCounter === HOW_MUCH_TURNS - 1){
                             pvp_01.removeAllListeners('progress');
@@ -1217,7 +1220,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < HOW_MUCH_TURNS - 1){
                         if(++theMessagesCounter === HOW_MUCH_TURNS - 1){
                             pvp_01.removeAllListeners('progress');
@@ -1603,17 +1606,20 @@ describe('testPvp.js', () => {
 
                 let callbackFn_Finish = (i, msg) => {
                     expect(msg.ok).to.be.equal(true);
+                    expect(msg.details.endMessage).to.have.property('gameIsOver', true);
+                    expect(msg.details.endMessage).to.have.property('finalm');
+                    expect(msg.details.endMessage.finalm).to.have.property('m');
                     try{
-                        expect(msg.details.endMessage).to.have.property('asq', HOW_MUCH_TURNS);
+                        expect(msg.details.endMessage.finalm).to.have.property('asq', HOW_MUCH_TURNS);
                     } catch(__){
-                        expect(msg.details.endMessage).to.have.property('bsq', HOW_MUCH_TURNS);
+                        expect(msg.details.endMessage.finalm).to.have.property('bsq', HOW_MUCH_TURNS);
                     }
                     try{
-                        expect(msg.details.endMessage).to.have.property('bsq', HOW_MUCH_TURNS - 1);
+                        expect(msg.details.endMessage.finalm).to.have.property('bsq', HOW_MUCH_TURNS - 1);
                     } catch(__){
-                        expect(msg.details.endMessage).to.have.property('asq', HOW_MUCH_TURNS - 1);
+                        expect(msg.details.endMessage.finalm).to.have.property('asq', HOW_MUCH_TURNS - 1);
                     }
-                    expect(msg.details.endMessage.m).to.deep.equal({ m: 'FIN!' });
+                    expect(msg.details.endMessage.finalm.m).to.deep.equal({ message: 'FIN!' });
 
                     if(i === 0){
                         if(!firstIsDone){
@@ -2129,7 +2135,7 @@ describe('testPvp.js', () => {
             var theMessagesCounter = 0;
 
             let callbackFn_Message = msg => {
-                msg = msg.m;
+                msg = msg.message;
                 if(theMessagesCounter === msg && msg < HOW_MUCH_DIRECT){
                     if(++theMessagesCounter === HOW_MUCH_DIRECT){
                         thePvp.removeAllListeners('progress');
@@ -2169,7 +2175,7 @@ describe('testPvp.js', () => {
             var theMessagesCounter = 0;
 
             let callbackFn_Message = msg => {
-                msg = msg.m;
+                msg = msg.m.message;
                 if(theMessagesCounter === msg && msg < HOW_MUCH_TURNS - 1){
                     if(++theMessagesCounter === HOW_MUCH_TURNS - 1){
                         thePvp.removeAllListeners('progress');
@@ -2301,9 +2307,12 @@ describe('testPvp.js', () => {
         it(`First player should finalize pvp by sending ${HOW_MUCH_TURNS}th turn`, done => {
             let callbackFn_Finish = msg => {
                 expect(msg.ok).to.be.equal(true);
-                expect(msg.details.endMessage).to.have.property('asq', HOW_MUCH_TURNS);
-                expect(msg.details.endMessage).to.have.property('bsq', 0);
-                expect(msg.details.endMessage.m).to.deep.equal({ m: 'FIN!' });
+                expect(msg.details.endMessage).to.have.property('gameIsOver', true);
+                expect(msg.details.endMessage).to.have.property('finalm');
+                expect(msg.details.endMessage.finalm).to.have.property('m');
+                expect(msg.details.endMessage.finalm).to.have.property('asq', HOW_MUCH_TURNS);
+                expect(msg.details.endMessage.finalm).to.have.property('bsq', 0);
+                expect(msg.details.endMessage.finalm.m).to.deep.equal({ message: 'FIN!' });
 
                 thePvp.removeAllListeners('progress');
                 thePvp.removeAllListeners('begin');
@@ -2487,7 +2496,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < 14){
                         if(++theMessagesCounter === 14){
                             pvp_02.removeAllListeners('turn-message');
@@ -2506,7 +2515,7 @@ describe('testPvp.js', () => {
                 var theMessagesCounter = 0;
 
                 let callbackFn_Message = msg => {
-                    msg = msg.m;
+                    msg = msg.m.message;
                     if(theMessagesCounter === msg && msg < 14){
                         if(++theMessagesCounter === 14){
                             pvp_01.removeAllListeners('turn-message');

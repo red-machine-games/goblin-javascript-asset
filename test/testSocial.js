@@ -91,7 +91,7 @@ describe('testSocial.js', () => {
                 expect(err).to.not.be.a('null');
                 expect(err).to.be.an.instanceof(GbaseError);
 
-                expect(err.details.body).to.deep.equal({ index: 179, message: 'Unknown or already consumed purchase' });
+                expect(err.details.body).to.deep.equal({ index: 1087, message: 'Unknown purchase' });
 
                 done();
             };
@@ -116,7 +116,7 @@ describe('testSocial.js', () => {
                 expect(err).to.not.be.a('null');
                 expect(err).to.be.an.instanceof(GbaseError);
 
-                expect(err.details.body).to.deep.equal({ index: 575, message: 'Unknown or already consumed purchase' });
+                expect(err.details.body).to.deep.equal({ index: 1084, message: 'Unknown purchase' });
 
                 done();
             };
