@@ -6,7 +6,7 @@ var expect = require('chai').expect,
 const LOCAL_ADDRESS = 'http://localhost:1337',
     HMAC_SECRET = 'default';
 
-var GbaseApi = require('../lib/GbaseApi.js'),
+var GbaseApi = require('../lib/GbaseApi.js').GbaseApi,
     GbaseResponse = require('../lib/objects/GbaseResponse.js');
 
 describe('testRecordsAndLeaderboard.js', () => {
