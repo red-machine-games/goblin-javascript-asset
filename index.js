@@ -5,7 +5,7 @@
  */
 
 var Gbase = {
-    GbaseApi: require('./lib/GbaseApi.js').GbaseApi,
+    GbaseApi: require('./lib/GbaseApi.js'),
     GbaseResponse: require('./lib/objects/GbaseResponse.js'),
     GbaseError: require('./lib/objects/GbaseError.js'),
     GbaseRangePicker: require('./lib/objects/GbaseRangePicker.js'),
