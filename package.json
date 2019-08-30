@@ -1,6 +1,6 @@
 {
   "name": "gbase-html5-sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JavaScript client library for Goblin Backend server",
   "main": "index.js",
   "scripts": {
