@@ -358,7 +358,6 @@ describe('testPvp.js', () => {
                 pvp_02.forceDestroyClient();
             });
         });
-
         describe('Get pvp done normally', () => {
             it('First should call dropMatchmaking', done => {
                 let callbackFn = (err, response) => {

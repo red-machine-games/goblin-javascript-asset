@@ -264,7 +264,7 @@ describe('testRecordsAndLeaderboard.js', () => {
                 expect(response).to.be.an.instanceof(GbaseResponse);
 
                 expect(response.ok).to.be.equal(true);
-                expect(response.details.originalResponse).to.deep.equal({ rec: 80085, hid: vipHumanId });
+                expect(response.details.originalResponse).to.deep.equal({ rec: 80085, hid: vipHumanId, rank: 1 });
 
                 done();
             };
