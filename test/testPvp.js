@@ -196,6 +196,41 @@ describe('testPvp.js', () => {
         });
     });
     describe('Player versus player', () => {
+        describe('No pair', () => {
+            it('First should call dropMatchmaking', done => {
+                let callbackFn = (err, response) => {
+                    expect(err).to.be.a('null');
+                    expect(response).to.be.an.instanceof(GbaseResponse);
+
+                    expect(response.ok).to.be.equal(true);
+                    expect(response.details.originalResponse).to.have.property('forReal');
+
+                    done();
+                };
+
+                gbaseApiStdl_01.pvp.dropMatchmaking(callbackFn);
+            });
+            it('First player should search for opponent for ~6 seconds', done => {
+                let callbackFn = (err, response) => {
+                    expect(err).to.be.a('null');
+                    expect(response).to.be.an.instanceof(GbaseResponse);
+
+                    expect(response.ok).to.be.equal(false);
+                    expect(response.details.originalResponse.stat).to.be.equal('MM: timeout');
+
+                    expect(Date.now() - startTs).to.be.at.least(6 * 1000);
+
+                    done();
+                };
+
+                var startTs = Date.now();
+                gbaseApiStdl_01.pvp.withOpponent(
+                    FROM_SEGMENT, GbaseApi.MATCHMAKING_STRATEGIES.BY_RATING,
+                    new GbaseRangePicker('any').range(GbaseRangePicker.NEGATIVE_INFINITY, GbaseRangePicker.POSITIVE_INFINITY),
+                    25, callbackFn
+                );
+            });
+        });
         describe('Pair die if second no connect', () => {
             it('First should call dropMatchmaking', done => {
                 let callbackFn = (err, response) => {
@@ -1278,7 +1313,8 @@ describe('testPvp.js', () => {
                 }
             });
             it('First player should force disconnect and the second should see the pause', done => {
-                let callbackFn = msg => {
+                let callbackFn = (msg, at) => {
+                    expect(at).to.be.above(0);
                     expect(msg).to.have.property('isA');
                     expect(msg).to.have.property('playerTurnA');
                     expect(msg).to.have.property('playerTurnB');
@@ -1348,7 +1384,8 @@ describe('testPvp.js', () => {
             it('First player should reconnect and the second should see unpaused', done => {
                 let gotUnpaused = false, gotModel = false;
 
-                let callbackFn_Unpause = msg => {
+                let callbackFn_Unpause = (msg, at) => {
+                    expect(at).to.be.above(0);
                     expect(msg).to.be.equal('GR: opponent connected');
 
                     gotUnpaused = true;

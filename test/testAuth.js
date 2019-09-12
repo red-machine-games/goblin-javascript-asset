@@ -7,7 +7,8 @@ const LOCAL_ADDRESS = 'http://localhost:1337',
     HMAC_SECRET = 'default';
 
 var GbaseApi = require('../lib/GbaseApi.js'),
-    GbaseResponse = require('../lib/objects/GbaseResponse.js');
+    GbaseResponse = require('../lib/objects/GbaseResponse.js'),
+    GbaseError = require('../lib/objects/GbaseError.js');
 
 describe('testAuth.js', () => {
     var gbaseApiStdl, gbaseApiWebVk, gbaseApiWebOk;
@@ -379,6 +380,85 @@ describe('testAuth.js', () => {
             expect(gbaseApiStdl.currentUnicorn).to.be.an('undefined');
             expect(gbaseApiStdl.currentAccount).to.be.an('undefined');
             expect(gbaseApiStdl.currentProfile).to.be.an('undefined');
+        });
+    });
+    describe('Reauth anon after afk', () => {
+        var gbaseApiAnon;
+
+        var gClientId, gClientSecret;
+
+        it('Should init api', () => {
+            gbaseApiAnon = new GbaseApi(null, null, HMAC_SECRET, 'stdl', '0.0.2', LOCAL_ADDRESS);
+        });
+        it('Should singup anon', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+                expect(response.details.originalResponse).to.have.property('gClientId');
+                expect(response.details.originalResponse).to.have.property('gClientSecret');
+                expect(response.details.originalResponse).to.have.property('unicorn');
+
+                gClientId = response.details.originalResponse.gClientId;
+                gClientSecret = response.details.originalResponse.gClientSecret;
+
+                done();
+            };
+
+            gbaseApiAnon.account.signupGbaseAnon(callbackFn);
+        });
+        it('Should wait for session to rot ~ 29 seconds', done => setTimeout(done, 29 * 1000));
+        it('Should see that session is done', done => {
+            let callbackFn = err => {
+                expect(err).to.not.be.a('null');
+                expect(err).to.deep.equal(new GbaseError('Looks like session is dead. Re-auth or fully reboot your app', 310, {
+                    "originalStatus": 401,
+                    "originalError": {
+                        "index": 423,
+                        "message": "Unknown unicorn"
+                    }
+                }));
+
+                done();
+            };
+
+            gbaseApiAnon.profile.create(callbackFn);
+        });
+        it('Should re-auth #1', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+                expect(response.details.originalResponse).to.have.property('gClientId');
+                expect(response.details.originalResponse).to.have.property('gClientSecret');
+                expect(response.details.originalResponse).to.have.property('unicorn');
+
+                expect(response.details.originalResponse.gClientId).to.be.equal(gClientId);
+                expect(response.details.originalResponse.gClientSecret).to.be.equal(gClientSecret);
+
+                done();
+            };
+
+            gbaseApiAnon.account.reAuth(callbackFn);
+        });
+        it('Should successfully done stuff', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+
+                done();
+            };
+
+            gbaseApiAnon.profile.create(callbackFn);
+        });
+        it('Should signout anon', () => {
+            gbaseApiAnon.account.signout();
+
+            expect(gbaseApiAnon.currentUnicorn).to.be.an('undefined');
         });
     });
     describe('Additional case for Facebook', () => {
