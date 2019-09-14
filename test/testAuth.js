@@ -382,7 +382,7 @@ describe('testAuth.js', () => {
             expect(gbaseApiStdl.currentProfile).to.be.an('undefined');
         });
     });
-    describe('Reauth anon after afk', () => {
+    describe.skip('Reauth anon after afk', () => {
         var gbaseApiAnon;
 
         var gClientId, gClientSecret;

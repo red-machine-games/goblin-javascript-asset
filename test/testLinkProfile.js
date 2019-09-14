@@ -15,7 +15,7 @@ describe('testLinkProfile.js', () => {
 
     const THE_VK_ID = '80085', THE_OK_ID = '7175', THE_FB_ID = '678';
 
-    var leHumanId = 1;
+    var leHumanId = 0;
 
     describe('Signups', () => {
         it('Should init api', () => {

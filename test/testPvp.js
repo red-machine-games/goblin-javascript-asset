@@ -110,7 +110,7 @@ describe('testPvp.js', () => {
         HOW_MUCH_TURNS = 15;
 
     var gbaseApiStdl_01, gbaseApiStdl_02;
-
+    
     describe('Sign up stuff', () => {
         it('Should init api', () => {
             gbaseApiStdl_01 = new GbaseApi(null, null, HMAC_SECRET, 'stdl', '0.0.2', LOCAL_ADDRESS);
@@ -1381,14 +1381,24 @@ describe('testPvp.js', () => {
                 }
                 throw new Error('WTF');
             });
-            it('First player should reconnect and the second should see unpaused', done => {
-                let gotUnpaused = false, gotModel = false;
+            it('First player should reconnect and both should see unpaused with the same timestamp', done => {
+                let gotUnpaused1 = false, gotUnpaused2 = false, gotModel = false,
+                    unpauseTs1, unpauseTs2;
 
-                let callbackFn_Unpause = (msg, at) => {
+                let callbackFn_Unpause1 = (msg, at) => {
                     expect(at).to.be.above(0);
                     expect(msg).to.be.equal('GR: opponent connected');
 
-                    gotUnpaused = true;
+                    gotUnpaused1 = true;
+                    unpauseTs1 = at;
+                    callbackFn();
+                };
+                let callbackFn_Unpause2 = (msg, at) => {
+                    expect(at).to.be.above(0);
+                    expect(msg).to.be.a('null');
+
+                    gotUnpaused2 = true;
+                    unpauseTs2 = at;
                     callbackFn();
                 };
                 let callbackFn_Model = msg => {
@@ -1404,7 +1414,9 @@ describe('testPvp.js', () => {
                     callbackFn();
                 };
                 let callbackFn = () => {
-                    if(gotUnpaused && gotModel){
+                    if(gotUnpaused1 && gotUnpaused2 && gotModel){
+                        expect(unpauseTs1).to.be.equal(unpauseTs2);
+
                         pvp_01.removeAllListeners('progress');
                         pvp_01.removeAllListeners('begin');
                         pvp_01.removeAllListeners('error');
@@ -1440,7 +1452,7 @@ describe('testPvp.js', () => {
                 pvp_01.on('sync', () => done(new Error('WTF 5')));
                 pvp_01.on('turn-message', () => done(new Error('WTF 6')));
                 pvp_01.on('paused', () => done(new Error('WTF 7')));
-                pvp_01.on('unpaused', () => done(new Error('WTF 8')));
+                pvp_01.on('unpaused', callbackFn_Unpause2);
 
                 pvp_02.on('progress', () => done(new Error('WTF 9')));
                 pvp_02.on('begin', () => done(new Error('WTF 10')));
@@ -1451,7 +1463,7 @@ describe('testPvp.js', () => {
                 pvp_02.on('sync', () => done(new Error('WTF 14')));
                 pvp_02.on('turn-message', () => done(new Error('WTF 15')));
                 pvp_02.on('paused', () => done(new Error('WTF 16')));
-                pvp_02.on('unpaused', callbackFn_Unpause);
+                pvp_02.on('unpaused', callbackFn_Unpause1);
 
                 pvp_01.reconnect();
             });
@@ -1525,6 +1537,9 @@ describe('testPvp.js', () => {
                 pvp_02.on('turn-message', () => done(new Error('WTF 14')));
                 pvp_02.on('paused', () => done(new Error('WTF 15')));
                 pvp_02.on('unpaused', () => done(new Error('WTF 16')));
+
+
+                var _SHIT = Date.now();
 
                 pvp_02.forceDestroyClient();
             });
