@@ -328,7 +328,7 @@ describe('testPvp.js', () => {
                     60, callbackFn_02
                 );
             });
-            it('First should connect, get a progress and the die', done => {
+            it('First should connect, get a progress and then die', done => {
                 var pairAllocatedProgress = false, pairDead = false;
 
                 let callbackFn_Progress = msg => {
@@ -1383,22 +1383,27 @@ describe('testPvp.js', () => {
             });
             it('First player should reconnect and both should see unpaused with the same timestamp', done => {
                 let gotUnpaused1 = false, gotUnpaused2 = false, gotModel = false,
-                    unpauseTs1, unpauseTs2;
+                    unpauseTs1, unpauseTs2,
+                    pauseTs1, pauseTs2;
 
-                let callbackFn_Unpause1 = (msg, at) => {
+                let callbackFn_Unpause1 = (msg, at, from) => {
                     expect(at).to.be.above(0);
+                    expect(from).to.be.above(0);
                     expect(msg).to.be.equal('GR: opponent connected');
 
                     gotUnpaused1 = true;
                     unpauseTs1 = at;
+                    pauseTs1 = from;
                     callbackFn();
                 };
-                let callbackFn_Unpause2 = (msg, at) => {
+                let callbackFn_Unpause2 = (msg, at, from) => {
                     expect(at).to.be.above(0);
+                    expect(from).to.be.above(0);
                     expect(msg).to.be.a('null');
 
                     gotUnpaused2 = true;
                     unpauseTs2 = at;
+                    pauseTs2 = from;
                     callbackFn();
                 };
                 let callbackFn_Model = msg => {
@@ -1416,6 +1421,7 @@ describe('testPvp.js', () => {
                 let callbackFn = () => {
                     if(gotUnpaused1 && gotUnpaused2 && gotModel){
                         expect(unpauseTs1).to.be.equal(unpauseTs2);
+                        expect(pauseTs1).to.be.equal(pauseTs2);
 
                         pvp_01.removeAllListeners('progress');
                         pvp_01.removeAllListeners('begin');
