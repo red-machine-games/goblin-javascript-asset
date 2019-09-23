@@ -110,7 +110,7 @@ describe('testPvp.js', () => {
         HOW_MUCH_TURNS = 15;
 
     var gbaseApiStdl_01, gbaseApiStdl_02;
-    
+
     describe('Sign up stuff', () => {
         it('Should init api', () => {
             gbaseApiStdl_01 = new GbaseApi(null, null, HMAC_SECRET, 'stdl', '0.0.2', LOCAL_ADDRESS);
@@ -1312,39 +1312,48 @@ describe('testPvp.js', () => {
                     pvp_02.sendTurn(i);
                 }
             });
-            it('First player should force disconnect and the second should see the pause', done => {
-                let callbackFn = (msg, at) => {
-                    expect(at).to.be.above(0);
-                    expect(msg).to.have.property('isA');
-                    expect(msg).to.have.property('playerTurnA');
-                    expect(msg).to.have.property('playerTurnB');
-                    expect(msg).to.have.property('theModel');
+            it('First player should force disconnect and both should see the pause', done => {
+                var pauseArguments1, pauseArguments2;
 
-                    setTimeout(() => {
-                        pvp_01.removeAllListeners('progress');
-                        pvp_01.removeAllListeners('begin');
-                        pvp_01.removeAllListeners('error');
-                        pvp_01.removeAllListeners('direct-message');
-                        pvp_01.removeAllListeners('finish');
-                        pvp_01.removeAllListeners('model');
-                        pvp_01.removeAllListeners('sync');
-                        pvp_01.removeAllListeners('turn-message');
-                        pvp_01.removeAllListeners('paused');
-                        pvp_01.removeAllListeners('unpaused');
+                let callbackFn = () => {
+                    if(pauseArguments1 && pauseArguments2){
+                        expect(pauseArguments1[0]).to.be.equal('Game paused due to disconnection');
+                        expect(pauseArguments1[1]).to.be.an('undefined');
+                        expect(pauseArguments1[2]).to.be.an('undefined');
 
-                        pvp_02.removeAllListeners('progress');
-                        pvp_02.removeAllListeners('begin');
-                        pvp_02.removeAllListeners('error');
-                        pvp_02.removeAllListeners('direct-message');
-                        pvp_02.removeAllListeners('finish');
-                        pvp_02.removeAllListeners('model');
-                        pvp_02.removeAllListeners('sync');
-                        pvp_02.removeAllListeners('turn-message');
-                        pvp_02.removeAllListeners('paused');
-                        pvp_02.removeAllListeners('unpaused');
+                        expect(pauseArguments2[0]).to.have.property('isA');
+                        expect(pauseArguments2[0]).to.have.property('playerTurnA');
+                        expect(pauseArguments2[0]).to.have.property('playerTurnB');
+                        expect(pauseArguments2[0]).to.have.property('theModel');
+                        expect(pauseArguments2[1]).to.be.above(0);
+                        expect(pauseArguments2[2]).to.be.an('undefined');
 
-                        done();
-                    }, 1000);
+                        setTimeout(() => {
+                            pvp_01.removeAllListeners('progress');
+                            pvp_01.removeAllListeners('begin');
+                            pvp_01.removeAllListeners('error');
+                            pvp_01.removeAllListeners('direct-message');
+                            pvp_01.removeAllListeners('finish');
+                            pvp_01.removeAllListeners('model');
+                            pvp_01.removeAllListeners('sync');
+                            pvp_01.removeAllListeners('turn-message');
+                            pvp_01.removeAllListeners('paused');
+                            pvp_01.removeAllListeners('unpaused');
+
+                            pvp_02.removeAllListeners('progress');
+                            pvp_02.removeAllListeners('begin');
+                            pvp_02.removeAllListeners('error');
+                            pvp_02.removeAllListeners('direct-message');
+                            pvp_02.removeAllListeners('finish');
+                            pvp_02.removeAllListeners('model');
+                            pvp_02.removeAllListeners('sync');
+                            pvp_02.removeAllListeners('turn-message');
+                            pvp_02.removeAllListeners('paused');
+                            pvp_02.removeAllListeners('unpaused');
+
+                            done();
+                        }, 1000);
+                    }
                 };
 
                 pvp_01.on('progress', () => done(new Error('WTF 1')));
@@ -1355,7 +1364,10 @@ describe('testPvp.js', () => {
                 pvp_01.on('model', () => done(new Error('WTF 5')));
                 pvp_01.on('sync', () => done(new Error('WTF 6')));
                 pvp_01.on('turn-message', () => done(new Error('WTF 7')));
-                pvp_01.on('paused', () => done(new Error('WTF 8')));
+                pvp_01.on('paused', (theMessage, ts1, ts2) => {
+                    pauseArguments1 = [theMessage, ts1, ts2];
+                    callbackFn();
+                });
                 pvp_01.on('unpaused', () => done(new Error('WTF 9')));
 
                 pvp_02.on('progress', () => done(new Error('WTF 10')));
@@ -1366,7 +1378,10 @@ describe('testPvp.js', () => {
                 pvp_02.on('model', () => done(new Error('WTF 14')));
                 pvp_02.on('sync', () => done(new Error('WTF 15')));
                 pvp_02.on('turn-message', () => done(new Error('WTF 16')));
-                pvp_02.on('paused', callbackFn);
+                pvp_02.on('paused', (theMessage, ts1, ts2) => {
+                    pauseArguments2 = [theMessage, ts1, ts2];
+                    callbackFn();
+                });
                 pvp_02.on('unpaused', () => done(new Error('WTF 17')));
 
                 pvp_01.forceDisconnect();
@@ -1474,7 +1489,8 @@ describe('testPvp.js', () => {
                 pvp_01.reconnect();
             });
             it('Second player should destroy pvp client', done => {
-                var gotFinish = false, gotPaused = false;
+                var gotFinish = false, pauseArguments1, pauseArguments2,
+                    gotPaused = false;
 
                 let callbackFn_Finish = response => {
                     expect(response.ok).to.be.equal(true);
@@ -1483,14 +1499,22 @@ describe('testPvp.js', () => {
                     gotFinish = true;
                     callbackFn();
                 };
-                let callbackFn_Paused = msg => {
-                    expect(msg).to.have.property('isA');
-                    expect(msg).to.have.property('playerTurnA');
-                    expect(msg).to.have.property('playerTurnB');
-                    expect(msg).to.have.property('theModel');
+                let callbackFn_Paused = () => {
+                    if(pauseArguments1 && pauseArguments2){
+                        expect(pauseArguments1[0]).to.have.property('isA');
+                        expect(pauseArguments1[0]).to.have.property('playerTurnA');
+                        expect(pauseArguments1[0]).to.have.property('playerTurnB');
+                        expect(pauseArguments1[0]).to.have.property('theModel');
+                        expect(pauseArguments1[1]).to.be.above(0);
+                        expect(pauseArguments1[2]).to.be.an('undefined');
 
-                    gotPaused = true;
-                    callbackFn();
+                        expect(pauseArguments2[0]).to.be.equal('Game paused due to disconnection');
+                        expect(pauseArguments2[1]).to.be.an('undefined');
+                        expect(pauseArguments2[2]).to.be.an('undefined');
+
+                        gotPaused = true;
+                        callbackFn();
+                    }
                 };
                 let callbackFn = () => {
                     if(gotFinish && gotPaused){
@@ -1530,7 +1554,10 @@ describe('testPvp.js', () => {
                 pvp_01.on('model', () => done(new Error('WTF 5')));
                 pvp_01.on('sync', () => done(new Error('WTF 6')));
                 pvp_01.on('turn-message', () => done(new Error('WTF 7')));
-                pvp_01.on('paused', callbackFn_Paused);
+                pvp_01.on('paused', (theMessage, ts1, ts2) => {
+                    pauseArguments1 = [theMessage, ts1, ts2];
+                    callbackFn_Paused();
+                });
                 pvp_01.on('unpaused', () => done(new Error('WTF 8')));
 
                 pvp_02.on('progress', () => done(new Error('WTF 9')));
@@ -1541,11 +1568,11 @@ describe('testPvp.js', () => {
                 pvp_02.on('model', () => done(new Error('WTF 12')));
                 pvp_02.on('sync', () => done(new Error('WTF 13')));
                 pvp_02.on('turn-message', () => done(new Error('WTF 14')));
-                pvp_02.on('paused', () => done(new Error('WTF 15')));
+                pvp_02.on('paused', (theMessage, ts1, ts2) => {
+                    pauseArguments2 = [theMessage, ts1, ts2];
+                    callbackFn_Paused();
+                });
                 pvp_02.on('unpaused', () => done(new Error('WTF 16')));
-
-
-                var _SHIT = Date.now();
 
                 pvp_02.forceDestroyClient();
             });
@@ -1568,7 +1595,8 @@ describe('testPvp.js', () => {
                 gbaseApiStdl_02.pvp.checkBattleNoSearch(callbackFn);
             });
             it('The second should rebuild his lost pvp', done => {
-                var connect = false, unpaused = false, theBegin = false, theSync = false;
+                var connect = false, unpauseArguments1, unpauseArguments2,
+                    unpaused = false, theBegin = false, theSync = false;
 
                 let callbackFn_Connect = (err, response) => {
                     expect(err).to.be.a('null');
@@ -1588,16 +1616,27 @@ describe('testPvp.js', () => {
                     pvp_02.on('sync', callbackFn_Sync);
                     pvp_02.on('turn-message', () => done(new Error('WTF 14')));
                     pvp_02.on('paused', () => done(new Error('WTF 15')));
-                    pvp_02.on('unpaused', () => done(new Error('WTF 16')));
+                    pvp_02.on('unpaused', (theMessage, ts1, ts2) => {
+                        unpauseArguments2 = [theMessage, ts1, ts2];
+                        callbackFn_Unpaused();
+                    });
 
                     connect = true;
                     callbackFn();
                 };
-                let callbackFn_Unpaused = msg => {
-                    expect(msg).to.be.equal('GR: opponent connected');
+                let callbackFn_Unpaused = () => {
+                    if(unpauseArguments1 && unpauseArguments2){
+                        expect(unpauseArguments1[0]).to.be.equal('GR: opponent connected');
+                        expect(unpauseArguments1[1]).to.be.above(0);
+                        expect(unpauseArguments1[2]).to.be.above(0);
 
-                    unpaused = true;
-                    callbackFn();
+                        expect(unpauseArguments2[0]).to.be.a('null');
+                        expect(unpauseArguments2[1]).to.be.above(0);
+                        expect(unpauseArguments2[2]).to.be.above(0);
+
+                        unpaused = true;
+                        callbackFn();
+                    }
                 };
                 let callbackFn_Begin = msg => {
                     expect(msg).to.be.a('undefined');
@@ -1654,7 +1693,10 @@ describe('testPvp.js', () => {
                 pvp_01.on('sync', () => done(new Error('WTF 6')));
                 pvp_01.on('turn-message', () => done(new Error('WTF 7')));
                 pvp_01.on('paused', () => done(new Error('WTF 8')));
-                pvp_01.on('unpaused', callbackFn_Unpaused);
+                pvp_01.on('unpaused', (theMessage, ts1, ts2) => {
+                    unpauseArguments1 = [theMessage, ts1, ts2];
+                    callbackFn_Unpaused();
+                });
 
                 gbaseApiStdl_02.pvp.beginOnAddressAndKey(pvpRoomData, callbackFn_Connect);
             });
@@ -1960,37 +2002,45 @@ describe('testPvp.js', () => {
                 pvp_02.doConnect({ payload: '02' });
             });
             it('First player should force disconnect and the second should see the pause', done => {
-                let callbackFn = msg => {
-                    expect(msg).to.have.property('isA');
-                    expect(msg).to.have.property('playerTurnA');
-                    expect(msg).to.have.property('playerTurnB');
-                    expect(msg).to.have.property('theModel');
+                var pauseArguments1, pauseArguments2;
 
-                    setTimeout(() => {
-                        pvp_01.removeAllListeners('progress');
-                        pvp_01.removeAllListeners('begin');
-                        pvp_01.removeAllListeners('error');
-                        pvp_01.removeAllListeners('direct-message');
-                        pvp_01.removeAllListeners('finish');
-                        pvp_01.removeAllListeners('model');
-                        pvp_01.removeAllListeners('sync');
-                        pvp_01.removeAllListeners('turn-message');
-                        pvp_01.removeAllListeners('paused');
-                        pvp_01.removeAllListeners('unpaused');
+                let callbackFn = () => {
+                    if(pauseArguments1 && pauseArguments2){
+                        expect(pauseArguments1[0]).to.be.equal('Game paused due to disconnection');
+                        expect(pauseArguments1[1]).to.be.an('undefined');
 
-                        pvp_02.removeAllListeners('progress');
-                        pvp_02.removeAllListeners('begin');
-                        pvp_02.removeAllListeners('error');
-                        pvp_02.removeAllListeners('direct-message');
-                        pvp_02.removeAllListeners('finish');
-                        pvp_02.removeAllListeners('model');
-                        pvp_02.removeAllListeners('sync');
-                        pvp_02.removeAllListeners('turn-message');
-                        pvp_02.removeAllListeners('paused');
-                        pvp_02.removeAllListeners('unpaused');
+                        expect(pauseArguments2[0]).to.have.property('isA');
+                        expect(pauseArguments2[0]).to.have.property('playerTurnA');
+                        expect(pauseArguments2[0]).to.have.property('playerTurnB');
+                        expect(pauseArguments2[0]).to.have.property('theModel');
+                        expect(pauseArguments2[1]).to.be.above(0);
 
-                        done();
-                    }, 1000);
+                        setTimeout(() => {
+                            pvp_01.removeAllListeners('progress');
+                            pvp_01.removeAllListeners('begin');
+                            pvp_01.removeAllListeners('error');
+                            pvp_01.removeAllListeners('direct-message');
+                            pvp_01.removeAllListeners('finish');
+                            pvp_01.removeAllListeners('model');
+                            pvp_01.removeAllListeners('sync');
+                            pvp_01.removeAllListeners('turn-message');
+                            pvp_01.removeAllListeners('paused');
+                            pvp_01.removeAllListeners('unpaused');
+
+                            pvp_02.removeAllListeners('progress');
+                            pvp_02.removeAllListeners('begin');
+                            pvp_02.removeAllListeners('error');
+                            pvp_02.removeAllListeners('direct-message');
+                            pvp_02.removeAllListeners('finish');
+                            pvp_02.removeAllListeners('model');
+                            pvp_02.removeAllListeners('sync');
+                            pvp_02.removeAllListeners('turn-message');
+                            pvp_02.removeAllListeners('paused');
+                            pvp_02.removeAllListeners('unpaused');
+
+                            done();
+                        }, 1000);
+                    }
                 };
 
                 pvp_01.on('progress', () => done(new Error('WTF 1')));
@@ -2001,7 +2051,10 @@ describe('testPvp.js', () => {
                 pvp_01.on('model', () => done(new Error('WTF 5')));
                 pvp_01.on('sync', () => done(new Error('WTF 6')));
                 pvp_01.on('turn-message', () => done(new Error('WTF 7')));
-                pvp_01.on('paused', () => done(new Error('WTF 8')));
+                pvp_01.on('paused', (theMessage, fromTs) => {
+                    pauseArguments1 = [theMessage, fromTs];
+                    callbackFn();
+                });
                 pvp_01.on('unpaused', () => done(new Error('WTF 9')));
 
                 pvp_02.on('progress', () => done(new Error('WTF 10')));
@@ -2012,7 +2065,10 @@ describe('testPvp.js', () => {
                 pvp_02.on('model', () => done(new Error('WTF 14')));
                 pvp_02.on('sync', () => done(new Error('WTF 15')));
                 pvp_02.on('turn-message', () => done(new Error('WTF 16')));
-                pvp_02.on('paused', callbackFn);
+                pvp_02.on('paused', (theMessage, fromTs) => {
+                    pauseArguments2 = [theMessage, fromTs];
+                    callbackFn();
+                });
                 pvp_02.on('unpaused', () => done(new Error('WTF 17')));
 
                 pvp_01.forceDisconnect();
