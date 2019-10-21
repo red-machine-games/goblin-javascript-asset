@@ -2,40 +2,12 @@
 
 var expect = require('chai').expect;
 
-const LOCAL_ADDRESS = 'http://localhost:1337',
-    HMAC_SECRET = 'default';
+const START_AT_HOST = require('./testEntryPoint.js').START_AT_HOST, START_AT_PORT = require('./testEntryPoint.js').START_AT_PORT,
+    LOCAL_ADDRESS = `http://${START_AT_HOST}:${START_AT_PORT}`,
+    HMAC_SECRET = require('./testEntryPoint.js').HMAC_SECRET;
 
 var GbaseApi = require('../lib/GbaseApi.js'),
     GbaseResponse = require('../lib/objects/GbaseResponse.js');
-
-/**
- * To run this test case you need to have 3 custom functions on Goblin backend: pveInit, pveAct and pveFinalize:
- *
- * pveInit:
- * ```
- * var turnsToFinish = 15,
- *     theModel = { turnsToFinish, currentTurn: 0 };
- *
- * PveInitResponse(theModel, { turnsToFinish });
- * ```
- *
- * pveAct:
- * ```
- * if(++args.battleModel.currentTurn === args.battleModel.turnsToFinish){
- *     return PveActResponse(true, null, { over: true });
- * } else {
- *     return PveActResponse(false, args.battleModel, { okay: true, turn: args.battleModel.currentTurn });
- * }
- * ```
- *
- * pveFinalize:
- * ```
- * appendSelfBattleJournalPve({ iAmThe: 'law' });
- *
- * PveFinalizeResponse();
- * ```
- *
- */
 
 describe('testPve.js', () => {
     var gbaseApiStdl;

@@ -2,8 +2,9 @@
 
 var expect = require('chai').expect;
 
-const LOCAL_ADDRESS = 'http://localhost:1337',
-    HMAC_SECRET = 'default';
+const START_AT_HOST = require('./testEntryPoint.js').START_AT_HOST, START_AT_PORT = require('./testEntryPoint.js').START_AT_PORT,
+    LOCAL_ADDRESS = `http://${START_AT_HOST}:${START_AT_PORT}`,
+    HMAC_SECRET = require('./testEntryPoint.js').HMAC_SECRET;
 
 var GbaseApi = require('../lib/GbaseApi.js'),
     GbaseResponse = require('../lib/objects/GbaseResponse.js');
@@ -15,7 +16,7 @@ describe('testLinkProfile.js', () => {
 
     const THE_VK_ID = '80085', THE_OK_ID = '7175', THE_FB_ID = '678';
 
-    var leHumanId = 0;
+    var leHumanId = 1;
 
     describe('Signups', () => {
         it('Should init api', () => {

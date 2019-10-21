@@ -2,7 +2,7 @@
 
 [![Latest Documentation](https://doxdox.org/images/badge-flat.svg)](https://doxdox.org/red-machine-games/goblin-javascript-asset)
 
-This is javascript asset to work with Goblin Backend: https://gbase.tech/
+This is javascript asset to work with Goblin Backend: https://github.com/red-machine-games/goblin-base-server
 
  - All dependencies are browser-compatible
  - Possible to use it from Node.js
@@ -20,3 +20,7 @@ From CDN:
 ```
 
 Online documentation here: [Doxdox hosted](https://doxdox.org/red-machine-games/goblin-javascript-asset)
+
+## License
+
+MIT

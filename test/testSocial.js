@@ -3,8 +3,11 @@
 var expect = require('chai').expect,
     crypto = require('crypto-js');
 
-const LOCAL_ADDRESS = 'http://localhost:1337',
-    HMAC_SECRET = 'default';
+const START_AT_HOST = require('./testEntryPoint.js').START_AT_HOST, START_AT_PORT = require('./testEntryPoint.js').START_AT_PORT,
+    LOCAL_ADDRESS = `http://${START_AT_HOST}:${START_AT_PORT}`,
+    HMAC_SECRET = require('./testEntryPoint.js').HMAC_SECRET;
+
+const OK_TEST_APPLICATION_SECRET_KEY = require('./testEntryPoint.js').OK_TEST_APPLICATION_SECRET_KEY;
 
 var GbaseApi = require('../lib/GbaseApi.js'),
     GbaseResponse = require('../lib/objects/GbaseResponse.js'),
@@ -56,7 +59,7 @@ describe('testSocial.js', () => {
             };
 
             var wellOkSession = 'okay',
-                okSecret = crypto.enc.Hex.stringify(crypto.MD5(`${THE_OK_ID}${wellOkSession}123`));
+                okSecret = crypto.enc.Hex.stringify(crypto.MD5(`${THE_OK_ID}${wellOkSession}${OK_TEST_APPLICATION_SECRET_KEY}`));
             gbaseApiWebOk.account.authWebOk(THE_OK_ID, okSecret, wellOkSession, callbackFn);
         });
         it('Should create profile OK', done => {

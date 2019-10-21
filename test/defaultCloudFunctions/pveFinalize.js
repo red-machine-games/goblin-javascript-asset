@@ -1,0 +1,3 @@
+appendSelfBattleJournalPve({ iAmThe: 'law' });
+
+PveFinalizeResponse();

@@ -3,8 +3,11 @@
 var expect = require('chai').expect,
     crypto = require('crypto-js');
 
-const LOCAL_ADDRESS = 'http://localhost:1337',
-    HMAC_SECRET = 'default';
+const START_AT_HOST = require('./testEntryPoint.js').START_AT_HOST, START_AT_PORT = require('./testEntryPoint.js').START_AT_PORT,
+    LOCAL_ADDRESS = `http://${START_AT_HOST}:${START_AT_PORT}`,
+    HMAC_SECRET = require('./testEntryPoint.js').HMAC_SECRET;
+
+const OK_TEST_APPLICATION_SECRET_KEY = require('./testEntryPoint.js').OK_TEST_APPLICATION_SECRET_KEY;
 
 var GbaseApi = require('../lib/GbaseApi.js'),
     GbaseResponse = require('../lib/objects/GbaseResponse.js'),
@@ -296,7 +299,7 @@ describe('testAuth.js', () => {
             };
 
             var wellOkSession = 'okay',
-                okSecret = crypto.enc.Hex.stringify(crypto.MD5(`${THE_OK_ID}${wellOkSession}123`));
+                okSecret = crypto.enc.Hex.stringify(crypto.MD5(`${THE_OK_ID}${wellOkSession}${OK_TEST_APPLICATION_SECRET_KEY}`));
             gbaseApiWebOk.account.authWebOk(THE_OK_ID, okSecret, wellOkSession, callbackFn);
         });
         it('Should signout #11', () => {
@@ -382,11 +385,18 @@ describe('testAuth.js', () => {
             expect(gbaseApiStdl.currentProfile).to.be.an('undefined');
         });
     });
-    describe.skip('Reauth anon after afk', () => {
+    describe('Reauth anon after afk', () => {
         var gbaseApiAnon;
 
         var gClientId, gClientSecret;
 
+        var cachedSessionLifetime;
+
+        it('Should do some stuff', () => {
+            var goblinBase = require('goblin-base-server').getGoblinBase();
+            cachedSessionLifetime = goblinBase.accountsConfig.sessionLifetime;
+            goblinBase.accountsConfig.sessionLifetime = 4000;
+        });
         it('Should init api', () => {
             gbaseApiAnon = new GbaseApi(null, null, HMAC_SECRET, 'stdl', '0.0.2', LOCAL_ADDRESS);
         });
@@ -408,10 +418,11 @@ describe('testAuth.js', () => {
 
             gbaseApiAnon.account.signupGbaseAnon(callbackFn);
         });
-        it('Should wait for session to rot ~ 29 seconds', done => setTimeout(done, 29 * 1000));
+        it('Should wait for session to rot 8 seconds', done => setTimeout(done, 8 * 1000));
         it('Should see that session is done', done => {
-            let callbackFn = err => {
+            let callbackFn = (err, response) => {
                 expect(err).to.not.be.a('null');
+                expect(response).to.be.a('undefined');
                 expect(err).to.deep.equal(new GbaseError('Looks like session is dead. Re-auth or fully reboot your app', 310, {
                     "originalStatus": 401,
                     "originalError": {
@@ -459,6 +470,9 @@ describe('testAuth.js', () => {
             gbaseApiAnon.account.signout();
 
             expect(gbaseApiAnon.currentUnicorn).to.be.an('undefined');
+        });
+        it('Should undo some stuff', () => {
+            require('goblin-base-server').getGoblinBase().accountsConfig.sessionLifetime = cachedSessionLifetime;
         });
     });
     describe('Additional case for Facebook', () => {
