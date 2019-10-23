@@ -100,6 +100,7 @@ describe('Run Goblin Base Server', () => {
             .requireAsCloudFunction('./defaultCloudFunctions/pvpGeneratePayload.js')
             .requireAsCloudFunction('./defaultCloudFunctions/pvpInitGameplayModel.js')
             .requireAsCloudFunction('./defaultCloudFunctions/pvpTurnHandler.js')
+            .requireAsCloudFunction('./defaultCloudFunctions/helloWorld.js')
             .addPlatform({ header: GoblinBase.PLATFORMS.STANDALONE })
             .addPlatform({ header: GoblinBase.PLATFORMS.WEB_VK })
             .addPlatform({ header: GoblinBase.PLATFORMS.WEB_OK })

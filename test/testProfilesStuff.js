@@ -363,4 +363,59 @@ describe('testProfilesStuff.js', () => {
             gbaseApiStdl.profile.getp(callbackFn);
         });
     });
+    describe('What about run cloud function', () => {
+        it('Should init api again', () => {
+            gbaseApiStdl = new GbaseApi(null, null, HMAC_SECRET, 'stdl', '0.0.2', LOCAL_ADDRESS);
+        });
+        it('Should signup again', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+
+                done();
+            };
+
+            gbaseApiStdl.account.signupGbaseAnon(callbackFn);
+        });
+        it('Should create profile', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+
+                done();
+            };
+
+            gbaseApiStdl.profile.create(callbackFn);
+        });
+        it('Should run the cloud function', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+                expect(response.details.originalResponse.okay).to.be.equal(true);
+
+                done();
+            };
+
+            gbaseApiStdl.cloudFunction('helloWorld', { toSet: 'herd' }, callbackFn);
+        });
+        it('Should get profile and see changes', done => {
+            let callbackFn = (err, response) => {
+                expect(err).to.be.a('null');
+                expect(response).to.be.an.instanceof(GbaseResponse);
+
+                expect(response.ok).to.be.equal(true);
+                expect(response.details.originalResponse.profileData.drum).to.be.equal('herd');
+
+                done();
+            };
+
+            gbaseApiStdl.profile.getp(callbackFn);
+        });
+    });
 });
