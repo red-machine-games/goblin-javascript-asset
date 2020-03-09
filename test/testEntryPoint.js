@@ -38,6 +38,7 @@ describe('Run Goblin Base Server', () => {
                 .setupServiceClient(REDIS_HOST, REDIS_PORT, { db: 5 })
                 .setupMaintenanceClient(REDIS_HOST, REDIS_PORT, { db: 6 })
                 .setupResourceLockerClient(REDIS_HOST, REDIS_PORT, { db: 7 })
+                .setupChatClient(REDIS_HOST, REDIS_PORT, { db: 8 })
             )
             .includeAccounts({ lastActionTimeout: 1000 * 60, sessionLifetime: 60 * 1000 })
             .includeProfiles()
@@ -89,6 +90,7 @@ describe('Run Goblin Base Server', () => {
             .includeSimplePve()
             .includeAuthoritarian()
             .includeCloudFunctions()
+            .configChats()
             .requireAsCloudFunction('./defaultCloudFunctions/pveInit.js')
             .requireAsCloudFunction('./defaultCloudFunctions/pveAct.js')
             .requireAsCloudFunction('./defaultCloudFunctions/pveFinalize.js')
@@ -144,6 +146,9 @@ describe('Social', () => {
 });
 describe('Tickets', () => {
     require('./testTickets.js');
+});
+describe('Chats', () => {
+    require('./testChats.js');
 });
 describe('Utils', () => {
     require('./testUtils.js');
