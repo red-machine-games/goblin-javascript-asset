@@ -1,6 +1,6 @@
 {
   "name": "gbase-html5-sdk",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "JavaScript client library for Goblin Base/Cloud server",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "crc-32": "1.2.0",
     "crypto-js": "3.1.9-1",
     "eventemitter3": "3.1.2",
-    "goblin-base-server": "file:../goblin-base-server",
+    "goblin-base-server": "0.1.7",
     "isomorphic-ws": "4.0.1",
     "object-path": "0.11.4",
     "store": "2.0.12",
